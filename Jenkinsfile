@@ -43,9 +43,9 @@ pipeline {
                              sh "scp -o StrictHostKeyChecking=no  blue-controller.yaml  blue-service.yaml  ec2-user@35.183.123.18:/home/ec2-user/"
                              script{
                                 try{
-	                            sh "ssh ec2-user@35.183.123.18 kubectl apply -f ."
+	                            sh "ssh ec2-user@35.183.123.18 sudo kubectl apply -f ."
 	                     }catch(error){
-	                            sh "ssh ec2-user@35.183.123.18 kubectl create -f ."
+	                            sh "ssh ec2-user@35.183.123.18 sudo kubectl create -f ."
                                           }
                             }
                          }
