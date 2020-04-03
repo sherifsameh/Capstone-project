@@ -40,7 +40,7 @@ pipeline {
         	stage('Deploy blue container') {
             		steps {
                           sshagent(['Project']) {
-                             sh "scp -o StrictHostKeyChecking=no  blue-controller.yaml  blue-service.yaml  ec2-user@35.183.123.18:/home/ec2-user/"
+                             sh "scp -o StrictHostKeyChecking=no  blue-controller.yaml ec2-user@35.183.123.18:/home/ec2-user/"
                              script{
                                 try{
 	                            sh "ssh ec2-user@35.183.123.18 sudo kubectl apply -f ."
@@ -55,22 +55,32 @@ pipeline {
 
                 stage('Deploy green container') {
                         steps {
-                                kubernetesDeploy(
-                                        kubeconfigId: 'kubeconfig',
-                                        configs: 'green-controller.yaml',
-                                        enableConfigSubstitution: true
-                                )
+                          sshagent(['Project']) {
+                             sh "scp -o StrictHostKeyChecking=no  green-controller.yaml ec2-user@35.183.123.18:/home/ec2-user/"
+                             script{
+                                try{
+	                            sh "ssh ec2-user@35.183.123.18 sudo kubectl apply -f ."
+	                     }catch(error){
+	                            sh "ssh ec2-user@35.183.123.18 sudo kubectl create -f ."
+                                          }
+                            }
+                         }
                         }
                 }
 
 
 		stage('Create the service in the cluster, redirect to blue') {
                         steps {
-                                kubernetesDeploy(
-                                        kubeconfigId: 'kubeconfig',
-                                        configs: 'blue-service.yaml',
-                                        enableConfigSubstitution: true
-                                )
+                          sshagent(['Project']) {
+                             sh "scp -o StrictHostKeyChecking=no  blue-service.yaml ec2-user@35.183.123.18:/home/ec2-user/"
+                             script{
+                                try{
+	                            sh "ssh ec2-user@35.183.123.18 sudo kubectl apply -f ."
+	                     }catch(error){
+	                            sh "ssh ec2-user@35.183.123.18 sudo kubectl create -f ."
+                                          }
+                            }
+                         }
                         }
 		}
 
@@ -82,11 +92,16 @@ pipeline {
 
                 stage('Create the service in the cluster, redirect to green') {
                         steps {
-                                kubernetesDeploy(
-                                        kubeconfigId: 'kubeconfig',
-                                        configs: 'green-service.yaml',
-                                        enableConfigSubstitution: true
-                                )
+                          sshagent(['Project']) {
+                             sh "scp -o StrictHostKeyChecking=no  green-service.yaml ec2-user@35.183.123.18:/home/ec2-user/"
+                             script{
+                                try{
+	                            sh "ssh ec2-user@35.183.123.18 sudo kubectl apply -f ."
+	                     }catch(error){
+	                            sh "ssh ec2-user@35.183.123.18 sudo kubectl create -f ."
+                                          }
+                            }
+                         }
                         }
                 }
 
